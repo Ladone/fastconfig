@@ -11,7 +11,7 @@ function writeOk() {
 }
 
 function writeTFI() {
-  printf "$1\n" >>$CONFIG_FASTCONFIG_INI
+  printf "$1\n" >> $CONFIG_FASTCONFIG_INI
 }
 
 function createFastconfigIni() {
@@ -21,21 +21,24 @@ function createFastconfigIni() {
 }
 
 function checkFastconfigIni() {
-  printf "Check fastconfig.ini"
+  printf "Check fastconfig.ini..."
 
-  if [[ ! -d "$CONFIG_FASTCONFIG_INI" ]]; then
+  if [[ ! -f "$CONFIG_FASTCONFIG_INI" ]]; then
     echo "You are not having $CONFIG_FASTCONFIG_INI."
     printf "You are want to create fastconfig.ini [Y/n]: "
 
     read answer
     if [[ "$answer" != "${answer[Yy]}" || -z "$answer" ]]; then
-      checkFastconfigIni
+      printf "Create fastconfig.ini..."
+      createFastconfigIni
+      writeOk
     fi
   else
     writeOk
   fi
 }
 
+checkFastconfigIni
 
 #if [[ ! -d "$CONFIG_DIR" ]]; then
 #  echo "You are not having $CONFIG_DIR"
