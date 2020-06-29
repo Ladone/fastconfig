@@ -1,0 +1,113 @@
+#!/bin/bash
+
+# # #
+# Default path to fastconfig
+CONFIG_FASTCONFIG_INI="$(pwd)/fastconfig.ini"
+CONFIG_DIRECTORY="$(pwd)/config"
+CONFIG_SOURCE_DIR="$(pwd)/source"
+
+
+# # #
+# Return all rows from PROJECT section fastconfig.ini
+function getProjects()
+{
+  awk '
+BEGIN {
+  FS="="
+  section=""
+}
+{
+  if(match($1, /\[PROJECTS\]/))
+  {
+    section=substr($1, match($1, /[^\[].*[^\]]/), RLENGTH)
+  } else if (match($1, /\[.+\]/)) {
+    section=substr($1, match($1, /[^\[].*[^\]]/), RLENGTH)
+  }
+
+  if("PROJECTS" == section)
+  {
+    if(0 == match($1, /^$/) && 0 == match($1, /\[PROJECTS\]/)) {
+        printf "%s=%s\n", $1, $2
+    }
+  }
+}
+' $CONFIG_FASTCONFIG_INI
+}
+
+# # #
+# Return count PROJECT section fastconfig.ini
+function getProjectsCount()
+{
+  echo "$(getProjects | wc -l | awk '{print $1}')"
+}
+
+# # #
+# Check path for it identity file or directory
+# 1 - it's file
+# 2 - it's directory
+# 0 - not exist or other
+function checkIsFileOrDirectory()
+{
+  if [[ -f $1 ]]; then
+    echo 1
+  elif [[ -d $1 ]]; then
+    echo 2
+  else
+    echo 0
+  fi
+}
+
+# # #
+# Copy project source file from your project
+function copyProjectSourceFiles()
+{
+  echo In $CONFIG_FASTCONFIG_INI finded "$(getProjectsCount)" projects
+  echo Check files and copy:
+
+  COUNT=0
+
+  getProjects | while read -r line
+  do
+    ((COUNT++))
+
+    LOCAL_PROJECT="$(echo "$line" | awk 'BEGIN{FS="="}{print $1}')"
+    LOCAL_PROJECT_PATH="$(echo "$line" | awk 'BEGIN{FS="="}{print $2}')"
+    LOCAL_SOURCE_CONFIG_PATH="${CONFIG_SOURCE_DIR}/${LOCAL_PROJECT}/"
+
+    printf "%d. Project: %s\t %s\n" $COUNT "$LOCAL_PROJECT" "$LOCAL_PROJECT_PATH"
+
+    if [[ 0 == $(checkIsFileOrDirectory "$CONFIG_SOURCE_DIR") ]]; then
+      mkdir "$CONFIG_SOURCE_DIR"
+    fi
+
+    if [[ 0 != $(checkIsFileOrDirectory "$LOCAL_PROJECT_PATH") ]]; then
+      if [[ 0 == $(checkIsFileOrDirectory "$LOCAL_SOURCE_CONFIG_PATH") ]]; then
+        mkdir "$LOCAL_SOURCE_CONFIG_PATH"
+      fi
+
+      cp "$LOCAL_PROJECT_PATH" "$LOCAL_SOURCE_CONFIG_PATH"
+    fi
+  done
+}
+
+# # #
+# Create config from file how placed in source
+function createConfigFromSource()
+{
+  if [[ 0 == $(checkIsFileOrDirectory "$CONFIG_DIRECTORY") ]]; then
+    mkdir "$CONFIG_DIRECTORY"
+  fi
+}
+
+# # #
+# Get filename from file
+function getSourceFileName() {
+  if [[ -n "$1" ]]; then
+     getProjects | awk -v project="$1" 'BEGIN {FS="="} {if($1 == project){print substr($2, match($2, /[^\/]+$/), RLENGTH)}}'
+  fi
+}
+
+#getSourceFileName panel
+#createConfigFromSource
+#copyProjectSourceFiles
+
