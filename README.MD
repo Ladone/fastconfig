@@ -15,7 +15,7 @@ Table of Contents
 =================
 
 <!--ts-->
-* [About] (#about)
+* [About](#about)
 * Table of Contents
 * Usage
   * Install
