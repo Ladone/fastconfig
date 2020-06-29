@@ -16,12 +16,12 @@ Table of Contents
 
 <!--ts-->
 * [About](#about)
-* Table of Contents
-* Usage
-  * Install
-  * Generate config
-  * Switch config
-* License
+* [Table of Contents](#table-of-contents)
+* [Usage](#usage)
+  * [Install](#install)
+  * [Generate config](#generate-config)
+  * [Switch config](#switch-config)
+* [License](#license)
 <!--te-->
 
 Usage
