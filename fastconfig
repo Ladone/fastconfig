@@ -17,19 +17,11 @@ BEGIN {
   section=""
 }
 {
-  if(match($1, /\[PROJECTS\]/))
+  if(match($1, /^\[[a-zA-Z0-9\_]+\]$/))
   {
-    section=substr($1, match($1, /[^\[].*[^\]]/), RLENGTH)
-  } else if (match($1, /\[.+\]/)) {
-    section=substr($1, match($1, /[^\[].*[^\]]/), RLENGTH)
+    print $1
   }
 
-  if("PROJECTS" == section)
-  {
-    if(0 == match($1, /^$/) && 0 == match($1, /\[PROJECTS\]/)) {
-        printf "%s=%s\n", $1, $2
-    }
-  }
 }
 ' $CONFIG_FASTCONFIG_INI
 }
@@ -107,7 +99,110 @@ function getSourceFileName() {
   fi
 }
 
+# # #
+# Find alias fastconfig.ini
+function findAlias()
+{
+  awk '
+BEGIN {
+  FS="="
+}
+{
+  print substr($1, match($1, /[^\[].*[^\]]/), RLENGTH)
+}
+' $CONFIG_FASTCONFIG_INI
+}
+
+# # #
+# add alias to config
+function addAlias()
+{
+  alias="[$1]"
+  aliasWithoutBrackets="$1"
+
+  # check STDIN alias
+  if [[ -n "$1" && $(printf "%s" "$alias" | awk '/^.+$/{print match($1, /[a-zA-Z0-9\_]+/)}') -gt 0 ]]; then
+    DIRECTORY_WITH_ALIAS="${CONFIG_DIRECTORY}/${alias}"
+
+    # Create config directory if not exists
+    if [[ 0 == $(checkIsFileOrDirectory "$CONFIG_DIRECTORY") ]]; then
+      mkdir $CONFIG_DIRECTORY
+    fi
+
+    # create config file
+    if [[ 0 == $(checkIsFileOrDirectory "$CONFIG_FASTCONFIG_INI") ]]; then
+      touch "$CONFIG_FASTCONFIG_INI"
+    fi
+
+    isAliasExist=$(awk -v alias="$alias" '
+    BEGIN {
+      FS="="
+      isFinded=0
+    }
+    {
+      configAlias=substr($1, match($1, /^\[[a-zA-Z0-9\_]+\]$/), RLENGTH)
+
+      if (configAlias == alias)
+      {
+        isFinded=1
+        exit 1
+      }
+    }
+    END {
+      print isFinded
+    }
+    ' "$CONFIG_FASTCONFIG_INI")
+
+    if [[ 1 == "$isAliasExist" ]]; then
+      echo "Alias $aliasWithoutBrackets already exist"
+    else
+      echo "$alias" >> "$CONFIG_FASTCONFIG_INI"
+      echo "root = path/to/project" >> "$CONFIG_FASTCONFIG_INI"
+      echo "source_file = path/to/config.php" >> "$CONFIG_FASTCONFIG_INI"
+      echo "output_file = path/to/config.php" >> "$CONFIG_FASTCONFIG_INI"
+      echo "output_file_name = output_file_name" >> "$CONFIG_FASTCONFIG_INI"
+      echo "" >> "$CONFIG_FASTCONFIG_INI"
+      echo "Alias $aliasWithoutBrackets has added"
+    fi
+
+  else
+    echo "Your need write alias name"
+  fi
+}
+
+# # #
+# Get list of commands
+function getHelp()
+{
+  echo "FastConfig "
+  echo "How to use [argument] [additional option]. For example -a my_alias"
+  echo ""
+  echo "    +--------------------------------------------------------+"
+  echo "    |                   TABLE OF COMMANDS                    |"
+  echo "    +----+------------+--------------------------------------+"
+  echo "    | -h | --help     | list all commands                    |"
+  echo "    +----+------------+--------------------------------------+"
+  echo "    | -a | --add      | add new aliast to fastconfig.ini     |"
+  echo "    +----+------------+--------------------------------------+"
+  echo "    | -s | --switch   | switch config by alias               |"
+  echo "    +----+------------+--------------------------------------+"
+  echo "    | -l | --list     | print list exist aliases             |"
+  echo "    +----+------------+--------------------------------------+"
+}
+
+
 #getSourceFileName panel
 #createConfigFromSource
 #copyProjectSourceFiles
 
+case $1 in
+  "-a" | "--add")
+    addAlias "$2"
+    ;;
+  "-l" | "--list")
+    getProjects | sed 's/^\[\(.*\)\]$/\1/'
+    ;;
+  * )
+    getHelp
+    ;;
+esac
