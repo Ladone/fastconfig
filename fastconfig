@@ -92,6 +92,53 @@ function createConfigFromSource()
 }
 
 # # #
+# return directive from fastconfig ini by alias
+function getDirective()
+{
+  if [[ -z $1 ]]; then
+    echo "Need set alias"
+  fi
+
+  if [[ -z $2 ]]; then
+    echo "Need set directive how value you want get"
+  fi
+
+  awk -v alias="$1" -v directive="$2" '
+  BEGIN {
+    FS="="
+    section=""
+    value=""
+    codeError="codeError:"
+  }
+  {
+
+  if (match($1, /^\[[a-zA-Z0-9\_]+\]$/)) {
+      currentAlias = substr($1, match($1, /[^\[].*[^\]]/), RLENGTH)
+
+      if ("" == section && currentAlias == alias) {
+        section = currentAlias
+      }
+
+      if (section != "" && section != currentAlias) {
+        exit 1
+      }
+  }
+
+  if (alias == section) {
+    gsub(" ", "", $1);
+    gsub(" ", "", $2);
+
+    if (directive == $1) {
+      value=$2
+      exit 1
+    }
+  }
+  } END {
+    print value
+  }' $CONFIG_FASTCONFIG_INI
+}
+
+# # #
 # Get filename from file
 function getSourceFileName() {
   if [[ -n "$1" ]]; then
@@ -184,16 +231,77 @@ function getHelp()
   echo "    +----+------------+--------------------------------------+"
   echo "    | -a | --add      | add new aliast to fastconfig.ini     |"
   echo "    +----+------------+--------------------------------------+"
+  echo "    | -g | --generate | generate all alliases                |"
+  echo "    |    |            | have additional options, you're can  |"
+  echo "    |    |            | add alias name to generate only one  |"
+  echo "    |    |            | directive                            |"
+  echo "    +----+------------+--------------------------------------+"
   echo "    | -s | --switch   | switch config by alias               |"
   echo "    +----+------------+--------------------------------------+"
   echo "    | -l | --list     | print list exist aliases             |"
   echo "    +----+------------+--------------------------------------+"
+  echo ""
 }
 
+# # #
+# Copy source files from projects to fastconfig config directory
+function generate()
+{
+  aliasesFromConfig=$(getProjects | sed 's/^\[\(.*\)\]$/\1/' )
+  COUNT=0
 
-#getSourceFileName panel
-#createConfigFromSource
-#copyProjectSourceFiles
+#  echo "List of projects:"
+#  for line in $aliasesFromConfig
+#  do
+#    ((COUNT++))
+#    echo "$COUNT. $line"
+#  done
+
+#  echo "$aliasesFromConfig"
+#  getDirective test3 "source_file"
+
+  for alias in $aliasesFromConfig
+  do
+
+  ((COUNT++))
+
+    GENERATE_CONFIG_DIR="$CONFIG_DIRECTORY/$alias"
+      awk -v alias="[$alias]" '
+      BEGIN  {
+        FS="="
+        section=""
+      }
+      {
+        aliasFromFile=substr($1, match($1, /^[[a-zA-Z0-9\_]+\]$/), RLENGTH)
+        if (aliasFromFile == alias && section == "" || section == alias) {
+          section=alias
+        } else {
+          exit 1
+        }
+      }' $CONFIG_FASTCONFIG_INI
+
+    if [[ 0 == $(checkIsFileOrDirectory "$GENERATE_CONFIG_DIR") ]]; then
+      echo "$COUNT. $alias"
+
+      echo "Alias $alias not finded by path $GENERATE_CONFIG_DIR"
+
+      mkdir $GENERATE_CONFIG_DIR
+      echo "Alias $alias created by path $GENERATE_CONFIG_DIR"
+
+    fi
+    echo "=============="
+    echo "$(getDirective $alias source_file)"
+    cp "$(getDirective $alias source_file)" "$GENERATE_CONFIG_DIR/"
+
+  done
+}
+
+# # #
+# Switch aliase for project
+function switch()
+{
+  echo "Stub method for switch function"
+}
 
 case $1 in
   "-a" | "--add")
@@ -202,7 +310,16 @@ case $1 in
   "-l" | "--list")
     getProjects | sed 's/^\[\(.*\)\]$/\1/'
     ;;
-  * )
+  "-h" | "--help" | "")
     getHelp
+    ;;
+  "-g" | "--generate")
+  generate
+    ;;
+  "-s" | "--switch")
+  switch
+    ;;
+  * )
+    echo "Command $1 not found, type -h for get list of commands"
     ;;
 esac
