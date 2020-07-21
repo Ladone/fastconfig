@@ -48,9 +48,31 @@ Init project
 ------------
 
 
-Generate config
+Config
 ---------------
+Config contains from alias name how create square brackets and some directives.
+For example config:
+```
+[example]
+source_file = path/to/config.php
+source_config_name = config_name
+output_dir = path/to/config.php
+output_file_name = output_file_name
+```
 
+1. [alias_name] — it's head block how say fastconfig alias name;
+2. source_file — need set path to your current file for this alias;
+3. output_dir — path to work project how source_file be put when user use switch;
+4. output_file_name — output file name in working dir.
+
+
+Directives
+==========
+
+source_file = path/to/config.php
+source_config_name = YOURNAME
+output_dir = path/to/config.php
+output_file_name = output_file_name
 
 Switch config
 -------------

@@ -204,9 +204,9 @@ function addAlias()
       echo "Alias $aliasWithoutBrackets already exist"
     else
       echo "$alias" >> "$CONFIG_FASTCONFIG_INI"
-      echo "root = path/to/project" >> "$CONFIG_FASTCONFIG_INI"
       echo "source_file = path/to/config.php" >> "$CONFIG_FASTCONFIG_INI"
-      echo "output_file = path/to/config.php" >> "$CONFIG_FASTCONFIG_INI"
+      echo "source_config_name = config_name" >> "$CONFIG_FASTCONFIG_INI"
+      echo "output_dir = path/to/config.php" >> "$CONFIG_FASTCONFIG_INI"
       echo "output_file_name = output_file_name" >> "$CONFIG_FASTCONFIG_INI"
       echo "" >> "$CONFIG_FASTCONFIG_INI"
       echo "Alias $aliasWithoutBrackets has added"
@@ -250,20 +250,8 @@ function generate()
   aliasesFromConfig=$(getProjects | sed 's/^\[\(.*\)\]$/\1/' )
   COUNT=0
 
-#  echo "List of projects:"
-#  for line in $aliasesFromConfig
-#  do
-#    ((COUNT++))
-#    echo "$COUNT. $line"
-#  done
-
-#  echo "$aliasesFromConfig"
-#  getDirective test3 "source_file"
-
   for alias in $aliasesFromConfig
   do
-
-  ((COUNT++))
 
     GENERATE_CONFIG_DIR="$CONFIG_DIRECTORY/$alias"
       awk -v alias="[$alias]" '
@@ -281,6 +269,8 @@ function generate()
       }' $CONFIG_FASTCONFIG_INI
 
     if [[ 0 == $(checkIsFileOrDirectory "$GENERATE_CONFIG_DIR") ]]; then
+      ((COUNT++))
+
       echo "$COUNT. $alias"
 
       echo "Alias $alias not finded by path $GENERATE_CONFIG_DIR"
@@ -288,10 +278,11 @@ function generate()
       mkdir $GENERATE_CONFIG_DIR
       echo "Alias $alias created by path $GENERATE_CONFIG_DIR"
 
+      cp "$(getDirective $alias source_file)" "$GENERATE_CONFIG_DIR/"
+
+
     fi
-    echo "=============="
-    echo "$(getDirective $alias source_file)"
-    cp "$(getDirective $alias source_file)" "$GENERATE_CONFIG_DIR/"
+
 
   done
 }
@@ -300,25 +291,55 @@ function generate()
 # Switch aliase for project
 function switch()
 {
-  echo "Stub method for switch function"
+  alias=$1
+  isFindAlias=0
+
+  if [[ -z "$alias" ]]; then
+    echo "Your are not set alias to switch"
+  fi
+
+  projects=$(getProjects | sed 's/^\[\(.*\)\]$/\1/')
+
+  for project in $projects;
+  do
+    if [[ "$alias" == "$project" ]]; then
+      isFindAlias=1
+    fi
+  done
+
+  if [[ 0 == "$isFindAlias" ]]; then
+    echo "Alias $alias is not finded in fastconfig.ini"
+    exit 1
+  fi
+
+  sourceFile="$CONFIG_DIRECTORY/$alias/$(getDirective "$alias" "source_config_name")"
+  outputFile="$(getDirective "$alias" "output_dir")/$(getDirective "$alias" "output_file_name")"
+
+  cp "$sourceFile" "$outputFile"
+  echo "Config has been switched"
 }
 
 case $1 in
   "-a" | "--add")
     addAlias "$2"
     ;;
+
   "-l" | "--list")
     getProjects | sed 's/^\[\(.*\)\]$/\1/'
     ;;
+
   "-h" | "--help" | "")
     getHelp
     ;;
+
   "-g" | "--generate")
   generate
     ;;
+
   "-s" | "--switch")
-  switch
+  switch $2
     ;;
+
   * )
     echo "Command $1 not found, type -h for get list of commands"
     ;;
