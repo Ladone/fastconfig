@@ -17,21 +17,12 @@ Table of Contents
 <!--ts-->
 * [About](#about)
 * [Table of Contents](#table-of-contents)
-* [Plans](#plans)
 * [Usage](#usage)
   * [Install](#install)
   * [Generate config](#generate-config)
   * [Switch config](#switch-config)
 * [License](#license)
 <!--te-->
-
-Plans
-=====
-1. Init project
-2. Add new alias to fastconfig
-3. Copy source file from Yii project to directory (with generate command)
-4. Switch project
-
 
 Usage
 =====
@@ -50,7 +41,7 @@ Init project
 
 Config
 ---------------
-Config contains from alias name how create square brackets and some directives.
+Config file it's `fastconfig.ini` how place on the root folder fastConfig. FastConfig contains from alias name how create square brackets and some directives.
 For example config:
 ```
 [example]
@@ -66,16 +57,9 @@ output_file_name = output_file_name
 4. output_file_name — output file name in working dir.
 
 
-Directives
-==========
-
-source_file = path/to/config.php
-source_config_name = YOURNAME
-output_dir = path/to/config.php
-output_file_name = output_file_name
-
 Switch config
 -------------
+Before switch config you need prepare FastConfig alias and use `./fasconfig -s aliasname`
 
 License
 =======
