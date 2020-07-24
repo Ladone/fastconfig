@@ -17,9 +17,10 @@ Table of Contents
 <!--ts-->
 * [About](#about)
 * [Table of Contents](#table-of-contents)
+* [Quick Start](#table-of-contents)
 * [Usage](#usage)
-  * [Install](#install)
-  * [Generate config](#generate-config)
+  * [Params of fastconfig.ini](#params-of-fastconfigini)
+  * [Config](#config)
   * [Switch config](#switch-config)
 * [License](#license)
 <!--te-->
@@ -45,10 +46,6 @@ Params of fastconfig.ini
 2. output_file_name — it's directive how change name your config when you use `switch` command;  
 3. source_file — directive how you need set source file. From this file generate file for future switch file;  
 4. output_file – path to generated file how put after use command switch.  
-
-
-Init project
-------------
 
 
 Config
