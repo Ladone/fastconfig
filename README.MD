@@ -9,7 +9,7 @@
 About
 =====
 
-Fast Config — it's bash tool how help fast change configs for Yii2 projects.
+Fast Config — it's bash tool how help fast change configs for your projects.
 
 Table of Contents
 =================
