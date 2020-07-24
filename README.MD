@@ -16,7 +16,7 @@ Fast Config — it's bash tool how help fast change configs for your projects.
 
 Changelog
 =========
-If you want read changelog just → [click me](https://github.com/Ladone/fastconfig/blob/master/CHANGELOG.MD) ←
+If you want read changelog just → <a href="https://github.com/Ladone/fastconfig/blob/master/CHANGELOG.MD" target="_blank">click me</a> ←
 
 Table of Contents
 =================
