@@ -24,9 +24,21 @@ Table of Contents
 * [License](#license)
 <!--te-->
 
+Quick Start
+===========
+FastConfig can has been installed for some steps:
+1. Clone project to your folder: `git clone git@github.com:Ladone/fastconfig.git`;
+2. Enter to directory FastConfig: `cd fastconfig`;
+3. Add alias to FastConfig `./fastconfig -a myFirstAlias`
+When you do this steps in root directory FastConfig has been created fastconfig.ini,
+how contains your alias. For this alias need edit directives for correct paths and names
+for your project;
+4. And you need call command how copy to FastConfig file from your project `./fastconfig -g`;
+5. Edit your config in FastConfig config directory and call `./fastconfig -s myFirstAlias`
+how copy your config to project directory with name how set in `output_file`.
+
 Usage
 =====
-
 Params of fastconfig.ini
 ------------------------
 1. root — it's directive how set project root folder;  
