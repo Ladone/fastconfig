@@ -16,7 +16,7 @@ Fast Config — it's bash tool how help fast change configs for your projects.
 
 Changelog
 =========
-
+If you want read changelog just → [click me] ←
 
 Table of Contents
 =================
@@ -101,3 +101,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+[click me]: https://github.com/Ladone/fastconfig/blob/master/CHANGELOG.MD
