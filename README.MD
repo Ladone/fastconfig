@@ -5,17 +5,25 @@
 |__|   |__,||___||_|    |_____||___||_|_||_|  |_||_  |
                                                  |___|
 ```
+![version](https://img.shields.io/badge/Changelog%20updated-24--07--2020-informational)
+![version](https://img.shields.io/badge/version-1.0-green)
+![license](https://img.shields.io/badge/license-MIT-red)
 
 About
 =====
 
 Fast Config — it's bash tool how help fast change configs for your projects.
 
+Changelog
+=========
+
+
 Table of Contents
 =================
 
 <!--ts-->
 * [About](#about)
+* [Changelog]
 * [Table of Contents](#table-of-contents)
 * [Quick Start](#table-of-contents)
 * [Usage](#usage)
